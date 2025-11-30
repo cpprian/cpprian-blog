@@ -1,49 +1,203 @@
 ---
-import BaseHead from '../components/BaseHead.astro';
-import Footer from '../components/Footer.astro';
-import Header from '../components/Header.astro';
-import { SITE_DESCRIPTION, SITE_TITLE } from '../consts';
+import Layout from '../layouts/Layout.astro';
+import BlogCard from '../components/BlogCard.astro';
+import { getCollection } from 'astro:content';
+
+const allPosts = await getCollection('blog');
+const sortedPosts = allPosts.sort((a, b) => 
+  new Date(b.data.pubDate).getTime() - new Date(a.data.pubDate).getTime()
+);
 ---
 
-<!doctype html>
-<html lang="en">
-	<head>
-		<BaseHead title={SITE_TITLE} description={SITE_DESCRIPTION} />
-	</head>
-	<body>
-		<Header />
-		<main>
-			<h1>🧑‍🚀 Hello, Astronaut!</h1>
-			<p>
-				Welcome to the official <a href="https://astro.build/">Astro</a> blog starter template. This
-				template serves as a lightweight, minimally-styled starting point for anyone looking to build
-				a personal website, blog, or portfolio with Astro.
-			</p>
-			<p>
-				This template comes with a few integrations already configured in your
-				<code>astro.config.mjs</code> file. You can customize your setup with
-				<a href="https://astro.build/integrations">Astro Integrations</a> to add tools like Tailwind,
-				React, or Vue to your project.
-			</p>
-			<p>Here are a few ideas on how to get started with the template:</p>
-			<ul>
-				<li>Edit this page in <code>src/pages/index.astro</code></li>
-				<li>Edit the site header items in <code>src/components/Header.astro</code></li>
-				<li>Add your name to the footer in <code>src/components/Footer.astro</code></li>
-				<li>Check out the included blog posts in <code>src/content/blog/</code></li>
-				<li>Customize the blog post page layout in <code>src/layouts/BlogPost.astro</code></li>
-			</ul>
-			<p>
-				Have fun! If you get stuck, remember to
-				<a href="https://docs.astro.build/">read the docs</a>
-				or <a href="https://astro.build/chat">join us on Discord</a> to ask questions.
-			</p>
-			<p>
-				Looking for a blog template with a bit more personality? Check out
-				<a href="https://github.com/Charca/astro-blog-template">astro-blog-template</a>
-				by <a href="https://twitter.com/Charca">Maxi Ferreira</a>.
-			</p>
-		</main>
-		<Footer />
-	</body>
-</html>
+<Layout title="Blog">
+  <header class="welcome">
+    <div class="ornament top">⚙</div>
+    <h1>Workshop</h1>
+    <p>Crafted thoughts on code, systems, and the art of building.</p>
+    <div class="ornament bottom">⚙</div>
+  </header>
+
+  <nav class="filters">
+    <div class="filter-group">
+      <button class="filter-btn active" data-filter="all">All</button>
+      <button class="filter-btn" data-filter="advent-of-code">Advent of Code</button>
+      <button class="filter-btn" data-filter="challenges">Challenges</button>
+      <button class="filter-btn" data-filter="essays">Essays</button>
+    </div>
+    <input 
+      type="search" 
+      placeholder="Search archives..." 
+      class="search-input"
+      id="searchInput"
+    />
+  </nav>
+
+  <main class="blog-grid" id="blogGrid">
+    {sortedPosts.map(post => (
+      <BlogCard post={post} />
+    ))}
+  </main>
+</Layout>
+
+<script>
+  const filterBtns = document.querySelectorAll('.filter-btn');
+  const searchInput = document.getElementById('searchInput') as HTMLInputElement;
+  const blogGrid = document.getElementById('blogGrid');
+  
+  filterBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      filterBtns.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+    });
+  });
+
+  searchInput?.addEventListener('input', (e) => {
+    const value = (e.target as HTMLInputElement).value.toLowerCase();
+  });
+</script>
+
+<style>
+  .welcome {
+    max-width: 42em;
+    margin: 0 auto 4em;
+    text-align: center;
+    padding: 2em 1em;
+    position: relative;
+    border: 2px solid #2a2520;
+    background: linear-gradient(135deg, #1a1614 0%, #0f0f0f 100%);
+    box-shadow: 
+      0 2px 8px rgba(0, 0, 0, 0.4),
+      inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  }
+
+  .ornament {
+    font-size: 1.5em;
+    color: #8b6f47;
+    opacity: 0.6;
+    margin: 0.5em 0;
+    text-shadow: 0 0 10px rgba(139, 111, 71, 0.3);
+  }
+
+  .welcome h1 {
+    font-size: 3em;
+    margin: 0.3em 0;
+    font-weight: 300;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: #d4af37;
+    text-shadow: 
+      0 0 20px rgba(212, 175, 55, 0.3),
+      2px 2px 4px rgba(0, 0, 0, 0.5);
+    font-family: Georgia, serif;
+  }
+
+  .welcome p {
+    font-size: 1.1em;
+    color: #c4a574;
+    margin: 0;
+    font-style: italic;
+    line-height: 1.6;
+  }
+
+  .filters {
+    max-width: 60em;
+    margin: 0 auto 3em;
+    display: flex;
+    gap: 1em;
+    flex-wrap: wrap;
+    align-items: center;
+    padding: 0 1em;
+  }
+
+  .filter-group {
+    display: flex;
+    gap: 0.5em;
+    flex-wrap: wrap;
+  }
+
+  .filter-btn {
+    padding: 0.6em 1.2em;
+    border: 2px solid #3a2f28;
+    background: linear-gradient(180deg, #2a2520 0%, #1a1614 100%);
+    color: #c4a574;
+    border-radius: 0;
+    cursor: pointer;
+    font-size: 0.85em;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    transition: all 0.3s;
+    box-shadow: 
+      inset 0 1px 0 rgba(255, 255, 255, 0.05),
+      0 2px 4px rgba(0, 0, 0, 0.3);
+    position: relative;
+  }
+
+  .filter-btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(180deg, rgba(212, 175, 55, 0.1) 0%, transparent 100%);
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+
+  .filter-btn:hover::before {
+    opacity: 1;
+  }
+
+  .filter-btn:hover {
+    border-color: #8b6f47;
+    box-shadow: 
+      inset 0 1px 0 rgba(255, 255, 255, 0.1),
+      0 0 12px rgba(139, 111, 71, 0.3);
+  }
+
+  .filter-btn.active {
+    background: linear-gradient(180deg, #8b6f47 0%, #6b5537 100%);
+    color: #1a1614;
+    border-color: #d4af37;
+    box-shadow: 
+      inset 0 1px 2px rgba(0, 0, 0, 0.3),
+      0 0 15px rgba(212, 175, 55, 0.4);
+  }
+
+  .search-input {
+    flex: 1;
+    min-width: 200px;
+    padding: 0.6em 1.2em;
+    border: 2px solid #3a2f28;
+    background: #1a1614;
+    color: #c4a574;
+    border-radius: 0;
+    font-size: 0.9em;
+    font-family: inherit;
+    box-shadow: 
+      inset 0 2px 4px rgba(0, 0, 0, 0.3),
+      0 1px 0 rgba(255, 255, 255, 0.05);
+  }
+
+  .search-input::placeholder {
+    color: #6b5537;
+    font-style: italic;
+  }
+
+  .search-input:focus {
+    outline: none;
+    border-color: #8b6f47;
+    box-shadow: 
+      inset 0 2px 4px rgba(0, 0, 0, 0.3),
+      0 0 10px rgba(139, 111, 71, 0.2);
+  }
+
+  .blog-grid {
+    max-width: 60em;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 2em;
+    padding: 0 1em;
+  }
+</style>

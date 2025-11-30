@@ -1,7 +1,8 @@
 ---
 title: 'Second post'
 description: 'Lorem ipsum dolor sit amet'
-pubDate: 'Jul 15 2022'
+pubDate: 2025-01-15
+tags: ["programming", "async", "performance"]
 heroImage: '../../assets/blog-placeholder-4.jpg'
 ---
 

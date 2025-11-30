@@ -1,0 +1,97 @@
+---
+import type { CollectionEntry } from 'astro:content';
+
+interface Props {
+  title: string;
+  prevPost: CollectionEntry<'blog'> | null;
+  nextPost: CollectionEntry<'blog'> | null;
+}
+
+const { title, prevPost, nextPost } = Astro.props;
+---
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{title}</title>
+    <link rel="stylesheet" href="/styles/global.css" />
+  </head>
+  <body>
+    <nav class="post-nav">
+      {prevPost && (
+        <a href={`/blog/${prevPost.id}`} class="nav-prev">
+          ← {prevPost.data.title}
+        </a>
+      )}
+      {nextPost && (
+        <a href={`/blog/${nextPost.id}`} class="nav-next">
+          {nextPost.data.title} →
+        </a>
+      )}
+    </nav>
+
+    <main class="post-container">
+      <slot />
+    </main>
+
+    <nav class="post-nav bottom">
+      {prevPost && (
+        <a href={`/blog/${prevPost.id}`} class="nav-prev">
+          ← {prevPost.data.title}
+        </a>
+      )}
+      {nextPost && (
+        <a href={`/blog/${nextPost.id}`} class="nav-next">
+          {nextPost.data.title} →
+        </a>
+      )}
+    </nav>
+  </body>
+</html>
+
+<style>
+  .post-nav {
+    max-width: 42em;
+    margin: 2em auto;
+    padding: 0 1em;
+    display: flex;
+    justify-content: space-between;
+    gap: 2em;
+    font-size: 0.9em;
+  }
+
+  .post-nav.bottom {
+    margin-top: 4em;
+    padding-top: 2em;
+    border-top: 2px solid #2a2520;
+  }
+
+  .nav-prev,
+  .nav-next {
+    text-decoration: none;
+    color: #8b6f47;
+    transition: all 0.3s;
+    padding: 0.5em 0;
+    border-bottom: 2px solid transparent;
+  }
+
+  .nav-prev:hover,
+  .nav-next:hover {
+    color: #d4af37;
+    border-bottom-color: #8b6f47;
+    text-shadow: 0 0 8px rgba(212, 175, 55, 0.2);
+  }
+
+  .nav-next {
+    text-align: right;
+    margin-left: auto;
+  }
+
+  .post-container {
+    max-width: 42em;
+    margin: 0 auto;
+    padding: 0 1em;
+  }
+</style>
